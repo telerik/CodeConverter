@@ -34,7 +34,28 @@ namespace ICSharpCode.CodeConverter.CSharp
 			MemberInInterface
 		}
 
-		public static CSharpSyntaxNode ConvertSingle(VBasic.VisualBasicCompilation compilation, VBasic.VisualBasicSyntaxTree syntaxTree)
+		public static ConversionResult ConvertText(string text, MetadataReference[] references)
+		{
+			if (text == null)
+				throw new ArgumentNullException(nameof(text));
+			if (references == null)
+				throw new ArgumentNullException(nameof(references));
+			var tree = (VBasic.VisualBasicSyntaxTree) VBasic.SyntaxFactory.ParseSyntaxTree(SourceText.From(text));
+			var compilation = VBasic.VisualBasicCompilation.Create("Conversion", new[] { tree }, references);
+			return ConvertSingle(compilation, tree);
+		}
+
+		public static ConversionResult ConvertSingle(VBasic.VisualBasicCompilation compilation, VBasic.VisualBasicSyntaxTree tree)
+		{
+			try {
+				return new ConversionResult(ConvertSingleToNode(compilation, tree).NormalizeWhitespace().ToFullString());
+			}
+			catch (Exception ex) {
+				return new ConversionResult(ex);
+			}
+		}
+
+		public static CSharpSyntaxNode ConvertSingleToNode(VBasic.VisualBasicCompilation compilation, VBasic.VisualBasicSyntaxTree syntaxTree)
 		{
 			return ConvertMultiple(compilation, new[] {syntaxTree}).Values.Single();
 		}
@@ -45,21 +66,6 @@ namespace ICSharpCode.CodeConverter.CSharp
 				tree => (CSharpSyntaxTree) SyntaxFactory.SyntaxTree(tree.GetRoot().Accept(new NodesVisitor(compilation.GetSemanticModel(tree, true)))));
 			var cSharpCompilation = CSharpCompilation.Create("Conversion", cSharpFirstPass.Values, compilation.References);
 			return cSharpFirstPass.ToDictionary(cs => cs.Key, cs => new CompilationErrorFixer(cSharpCompilation, cs.Value).Fix());
-		}
-
-		public static ConversionResult ConvertText(string text, MetadataReference[] references)
-		{
-			if (text == null)
-				throw new ArgumentNullException(nameof(text));
-			if (references == null)
-				throw new ArgumentNullException(nameof(references));
-			var tree = (VBasic.VisualBasicSyntaxTree) VBasic.SyntaxFactory.ParseSyntaxTree(SourceText.From(text));
-			var compilation = VBasic.VisualBasicCompilation.Create("Conversion", new[] { tree }, references);
-			try {
-				return new ConversionResult(ConvertSingle(compilation, tree).NormalizeWhitespace().ToFullString());
-			} catch (Exception ex) {
-				return new ConversionResult(ex);
-			}
 		}
 
 		static Dictionary<string, VariableDeclarationSyntax> SplitVariableDeclarations(VBSyntax.VariableDeclaratorSyntax declarator, NodesVisitor nodesVisitor, SemanticModel semanticModel)
