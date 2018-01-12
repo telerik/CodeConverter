@@ -116,12 +116,11 @@ namespace RefactoringEssentials.VsExtension
 
 		async Task<ConversionResult> TryConvertingVBToCSCode(string documentPath)
 		{
-			var documentId = visualStudioWorkspace.CurrentSolution.GetDocumentIdsWithFilePath(documentPath).Single();//
+			var documentId = visualStudioWorkspace.CurrentSolution.GetDocumentIdsWithFilePath(documentPath).Single();
 			var document = visualStudioWorkspace.CurrentSolution.GetDocument(documentId);
 			var syntaxTree = await document.GetSyntaxTreeAsync();
 			var compilation = await document.Project.GetCompilationAsync();
-			//TODO upgrade references, then fix issue copying them to extension dir
-			return null; //VisualBasicConverter.ConvertSingle((VisualBasicCompilation)compilation, (VisualBasicSyntaxTree)syntaxTree);
+			return VisualBasicConverter.ConvertSingle((VisualBasicCompilation)compilation, (VisualBasicSyntaxTree)syntaxTree);
 		}
 
 		void WriteStatusBarText(string text)
