@@ -41,7 +41,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="AngularJS.Core" Version="1.5.2" />
-    <PackageReference Include="bootstrap" Version="3.3.6" />
+    <PackageReference Include="bootstrap" Version="3.4.1" />
     <PackageReference Include="jQuery" Version="2.2.2" />
     <PackageReference Include="ManagedEsent" Version="1.9.4" />
     <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.3" />
