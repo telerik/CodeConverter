@@ -51,7 +51,7 @@ jobs:
         run: ls ~/.nuget/packages/**
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3.1.2
+        uses: actions/upload-artifact@v4
         with:
           name: ${{inputs.artifacts-name}}
           path: ${{inputs.azure-package-path}}
