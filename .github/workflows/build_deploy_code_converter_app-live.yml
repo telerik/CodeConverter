@@ -22,7 +22,7 @@ jobs:
       id-token: write
     needs: build
     runs-on: ubuntu-latest
-    environment: 'Production'
+    environment: 'production'
 
     steps:
       - name: Download artifact from build job
